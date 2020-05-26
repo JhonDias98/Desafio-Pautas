@@ -1,6 +1,7 @@
 package br.com.compasso.DesafioPauta.service.impl;
 
 import br.com.compasso.DesafioPauta.entity.Agenda;
+import br.com.compasso.DesafioPauta.entity.Associated;
 import br.com.compasso.DesafioPauta.entity.Vote;
 import br.com.compasso.DesafioPauta.enumeration.AgendaStatus;
 import br.com.compasso.DesafioPauta.repository.AgendaRepository;
@@ -32,13 +33,15 @@ public class VoteServiceImpl implements VoteService {
     public Vote register(Vote vote) {
 
         Agenda agenda = agendaService.find(vote.getAgenda().getId());
-        if (agenda.getStatus().equals(AgendaStatus.OPEN) && !verifyVoteAssociate(this.list(), agenda)) {
+        Associated associated = associatedService.find(vote.getAssociated().getId());
+
+        if (agenda.getStatus().equals(AgendaStatus.OPEN) && !verifyVoteAssociate(this.list(), agenda, associated)) {
 
             vote.setAgenda(agenda);
             agenda.voteIn(vote.getResponse());
             agendaService.update(vote.getAgenda());
 
-            vote.setAssociated(associatedService.find(vote.getAssociated().getId()));
+            vote.setAssociated(associated);
 
             return voteRepository.save(vote);
         } else {
@@ -46,7 +49,8 @@ public class VoteServiceImpl implements VoteService {
         }
     }
 
-    private boolean verifyVoteAssociate(List<Vote> list, Agenda agenda) {
-        return list.stream().anyMatch(vote -> vote.getAgenda().getId().equals(agenda.getId()));
+    private boolean verifyVoteAssociate(List<Vote> list, Agenda agenda, Associated associated) {
+
+        return list.stream().anyMatch(vote -> vote.getAgenda().getId().equals(agenda.getId()) && vote.getAssociated().getId().equals(associated.getId()));
     }
 }
