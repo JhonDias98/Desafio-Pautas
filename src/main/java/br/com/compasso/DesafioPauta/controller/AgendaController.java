@@ -5,6 +5,9 @@ import br.com.compasso.DesafioPauta.dto.AgendaDto;
 import br.com.compasso.DesafioPauta.dto.entry.AgendaEntry;
 import br.com.compasso.DesafioPauta.entity.Agenda;
 import br.com.compasso.DesafioPauta.service.impl.AgendaServiceImpl;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,15 +29,25 @@ public class AgendaController {
 
 
     @GetMapping
+    @ApiOperation(value = "List all registered agendas")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "List meeting agendas", response = AgendaDto.class),
+            @ApiResponse(code = 500, message = "Internal Server Error")
+    })
     public ResponseEntity<List<AgendaDto>> listAgendas() {
         try {
             return new ResponseEntity<>(agendaConverter.listAgendaToListAgendaDto(agendaService.list()), HttpStatus.OK);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping(path = "/{id}")
+    @ApiOperation(value = "Find agenda by ID")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Pick agenda by variable path", response = AgendaDto.class),
+            @ApiResponse(code = 204, message = "Agenda not found")
+    })
     public ResponseEntity<AgendaDto> pickUpAgenda(@PathVariable String id) {
         try {
             return new ResponseEntity<>(agendaConverter.agendaToAgendaDto(agendaService.find(id)), HttpStatus.OK);
@@ -44,6 +57,11 @@ public class AgendaController {
     }
 
     @PostMapping
+    @ApiOperation(value = "Register a new agenda")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Agenda registered successful", response = AgendaDto.class),
+            @ApiResponse(code = 404, message = "It wasn't possible to register the agenda")
+    })
     public ResponseEntity<AgendaDto> createAgenda(@Valid @RequestBody AgendaEntry entry) {
         try {
             Agenda agenda = agendaConverter.entryToAgenda(entry);
@@ -54,6 +72,7 @@ public class AgendaController {
     }
 
     @DeleteMapping(path = "/{id}")
+    @ApiOperation(value = "Delete agenda by ID")
     public void deleteAgenda(@PathVariable("id") String id) {
         agendaService.delete(id);
     }
