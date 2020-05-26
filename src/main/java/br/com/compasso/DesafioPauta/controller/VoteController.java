@@ -5,6 +5,9 @@ import br.com.compasso.DesafioPauta.dto.VoteDto;
 import br.com.compasso.DesafioPauta.dto.entry.VoteEntry;
 import br.com.compasso.DesafioPauta.entity.Vote;
 import br.com.compasso.DesafioPauta.service.impl.VoteServiceImpl;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -27,6 +30,11 @@ public class VoteController {
     }
 
     @GetMapping
+    @ApiOperation(value = "List all votes")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful listing", response = VoteDto.class),
+            @ApiResponse(code = 500, message = "Internal Server Error")
+    })
     public ResponseEntity<List<VoteDto>> listVotes() {
 
         try{
@@ -38,11 +46,16 @@ public class VoteController {
     }
 
     @PostMapping
+    @ApiOperation(value = "Register a vote")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successful registering vote", response = VoteDto.class),
+            @ApiResponse(code = 400, message = "Bad request")
+    })
     public ResponseEntity<VoteDto> registerVote(@Valid @RequestBody VoteEntry entry) {
 
         try{
             Vote vote = voteConverter.entryToVote(entry);
-            return new ResponseEntity<>(voteConverter.voteToVoteDto(voteService.register(vote)), HttpStatus.OK);
+            return new ResponseEntity<>(voteConverter.voteToVoteDto(voteService.register(vote)), HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
