@@ -32,7 +32,8 @@ public class VoteServiceImpl implements VoteService {
     public Vote register(Vote vote) {
 
         Agenda agenda = agendaService.find(vote.getAgenda().getId());
-        if(agenda.getStatus().equals(AgendaStatus.OPEN)){
+        if (agenda.getStatus().equals(AgendaStatus.OPEN) && !verifyVoteAssociate(this.list(), agenda)) {
+
             vote.setAgenda(agenda);
             agenda.voteIn(vote.getResponse());
             agendaService.update(vote.getAgenda());
@@ -43,5 +44,9 @@ public class VoteServiceImpl implements VoteService {
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    private boolean verifyVoteAssociate(List<Vote> list, Agenda agenda) {
+        return list.stream().anyMatch(vote -> vote.getAgenda().getId().equals(agenda.getId()));
     }
 }
