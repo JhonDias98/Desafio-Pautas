@@ -9,11 +9,13 @@ import br.com.compasso.DesafioPauta.service.impl.AgendaServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.awt.print.Pageable;
 import java.util.List;
 
 @RestController
@@ -33,6 +35,7 @@ public class AgendaController {
     @ApiOperation(value = "List all registered agendas")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "List meeting agendas", response = AgendaDto.class),
+            @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<List<AgendaDto>> listAgendas() {
@@ -47,13 +50,15 @@ public class AgendaController {
     @ApiOperation(value = "Find agenda by ID")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Pick agenda by variable path", response = AgendaDto.class),
-            @ApiResponse(code = 204, message = "Agenda not found")
+            @ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 404, message = "Agenda not found"),
+            @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<AgendaDto> pickUpAgenda(@PathVariable String id) {
         try {
             return new ResponseEntity<>(agendaConverter.agendaToAgendaDto(agendaService.find(id)), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -61,7 +66,9 @@ public class AgendaController {
     @ApiOperation(value = "Return results of agendas")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "List results successful", response = AgendaDtoDetails.class),
-
+            @ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<List<AgendaDtoDetails>> listAgendaDetails() {
 
@@ -77,7 +84,8 @@ public class AgendaController {
     @ApiOperation(value = "Register a new agenda")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Agenda registered successful", response = AgendaDto.class),
-            @ApiResponse(code = 404, message = "It wasn't possible to register the agenda")
+            @ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 500, message = "Internal Sever Error")
     })
     public ResponseEntity<AgendaDto> createAgenda(@Valid @RequestBody AgendaEntry entry) {
         try {
@@ -90,6 +98,11 @@ public class AgendaController {
 
     @DeleteMapping(path = "/{id}")
     @ApiOperation(value = "Delete agenda by ID")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 500, message = "Internal Sever Error")
+    })
     public void deleteAgenda(@PathVariable("id") String id) {
         agendaService.delete(id);
     }
