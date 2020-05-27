@@ -5,6 +5,7 @@ import br.com.compasso.DesafioPauta.enumeration.VoteResponse;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -14,7 +15,9 @@ public class Vote {
 
     @Id
     private String id;
+    @DBRef
     private Agenda agenda;
+    @DBRef
     private Associated associated;
     private VoteResponse response;
 
