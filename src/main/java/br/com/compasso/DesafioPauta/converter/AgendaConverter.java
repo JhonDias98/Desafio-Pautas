@@ -1,6 +1,7 @@
 package br.com.compasso.DesafioPauta.converter;
 
 import br.com.compasso.DesafioPauta.dto.AgendaDto;
+import br.com.compasso.DesafioPauta.dto.details.AgendaDtoDetails;
 import br.com.compasso.DesafioPauta.dto.entry.AgendaEntry;
 import br.com.compasso.DesafioPauta.entity.Agenda;
 import org.springframework.stereotype.Component;
@@ -20,5 +21,9 @@ public class AgendaConverter {
 
     public Agenda entryToAgenda(AgendaEntry entry) {
         return new Agenda(entry);
+    }
+
+    public List<AgendaDtoDetails> agendaToAgendaDtoDetails(List<Agenda> list) {
+        return list.stream().map(AgendaDtoDetails::new).collect(Collectors.toList());
     }
 }

@@ -2,6 +2,7 @@ package br.com.compasso.DesafioPauta.controller;
 
 import br.com.compasso.DesafioPauta.converter.AgendaConverter;
 import br.com.compasso.DesafioPauta.dto.AgendaDto;
+import br.com.compasso.DesafioPauta.dto.details.AgendaDtoDetails;
 import br.com.compasso.DesafioPauta.dto.entry.AgendaEntry;
 import br.com.compasso.DesafioPauta.entity.Agenda;
 import br.com.compasso.DesafioPauta.service.impl.AgendaServiceImpl;
@@ -53,6 +54,22 @@ public class AgendaController {
             return new ResponseEntity<>(agendaConverter.agendaToAgendaDto(agendaService.find(id)), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+    }
+
+    @GetMapping(path = "/result")
+    @ApiOperation(value = "Return results of agendas")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "List results successful", response = AgendaDtoDetails.class),
+
+    })
+    public ResponseEntity<List<AgendaDtoDetails>> listAgendaDetails() {
+
+        try{
+            List<AgendaDtoDetails> agendaDtoDetails = agendaConverter.agendaToAgendaDtoDetails(agendaService.list());
+            return new ResponseEntity<>(agendaDtoDetails, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
