@@ -9,13 +9,11 @@ import br.com.compasso.DesafioPauta.service.impl.AgendaServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.awt.print.Pageable;
 import java.util.List;
 
 @RestController
@@ -54,9 +52,9 @@ public class AgendaController {
             @ApiResponse(code = 404, message = "Agenda not found"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    public ResponseEntity<AgendaDto> pickUpAgenda(@PathVariable String id) {
+    public ResponseEntity<AgendaDtoDetails> pickUpAgenda(@PathVariable String id) {
         try {
-            return new ResponseEntity<>(agendaConverter.agendaToAgendaDto(agendaService.find(id)), HttpStatus.OK);
+            return new ResponseEntity<>(agendaConverter.agendaToAgendaDtoDetails(agendaService.find(id)), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -72,8 +70,8 @@ public class AgendaController {
     })
     public ResponseEntity<List<AgendaDtoDetails>> listAgendaDetails() {
 
-        try{
-            List<AgendaDtoDetails> agendaDtoDetails = agendaConverter.agendaToAgendaDtoDetails(agendaService.list());
+        try {
+            List<AgendaDtoDetails> agendaDtoDetails = agendaConverter.agendasToAgendasDtoDetails(agendaService.list());
             return new ResponseEntity<>(agendaDtoDetails, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -23,7 +23,11 @@ public class AgendaConverter {
         return new Agenda(entry);
     }
 
-    public List<AgendaDtoDetails> agendaToAgendaDtoDetails(List<Agenda> list) {
+    public List<AgendaDtoDetails> agendasToAgendasDtoDetails(List<Agenda> list) {
         return list.stream().map(AgendaDtoDetails::new).collect(Collectors.toList());
+    }
+
+    public AgendaDtoDetails agendaToAgendaDtoDetails(Agenda agenda) {
+        return new AgendaDtoDetails(agenda);
     }
 }
