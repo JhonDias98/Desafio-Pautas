@@ -35,7 +35,7 @@ public class VoteServiceImpl implements VoteService {
         Agenda agenda = agendaService.find(vote.getAgenda().getId());
         Associated associated = associatedService.find(vote.getAssociated().getId());
 
-        if (agenda.getStatus().equals(AgendaStatus.OPEN) && !verifyVoteAssociate(this.list(), agenda, associated)) {
+        if (agendaIsOpenAndAssociatedNeverVoted(agenda, associated)) {
 
             vote.setAgenda(agenda);
             agenda.voteIn(vote.getResponse());
@@ -47,6 +47,10 @@ public class VoteServiceImpl implements VoteService {
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    private boolean agendaIsOpenAndAssociatedNeverVoted(Agenda agenda, Associated associated) {
+        return agenda.getStatus().equals(AgendaStatus.OPEN) && !verifyVoteAssociate(this.list(), agenda, associated);
     }
 
     private boolean verifyVoteAssociate(List<Vote> list, Agenda agenda, Associated associated) {

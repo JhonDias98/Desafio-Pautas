@@ -2,16 +2,16 @@ package br.com.compasso.DesafioPauta.entity;
 
 
 import br.com.compasso.DesafioPauta.dto.entry.AssociatedEntry;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Document
+@Builder
+@EqualsAndHashCode
 public class Associated {
 
     @Id
