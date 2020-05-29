@@ -2,6 +2,8 @@ package br.com.compasso.DesafioPauta.entity;
 
 import br.com.compasso.DesafioPauta.dto.entry.VoteEntry;
 import br.com.compasso.DesafioPauta.enumeration.VoteResponse;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -11,6 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @NoArgsConstructor
 @Document
+@AllArgsConstructor
+@Builder
 public class Vote {
 
     @Id
