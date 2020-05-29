@@ -1,6 +1,7 @@
 package br.com.compasso.DesafioPauta.service.impl;
 
 import br.com.compasso.DesafioPauta.entity.Associated;
+
 import br.com.compasso.DesafioPauta.repository.AssociatedRepository;
 import br.com.compasso.DesafioPauta.service.AssociatedService;
 import org.springframework.stereotype.Service;
