@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -65,6 +66,22 @@ class VoteServiceImplTest {
         Vote register = voteService.register(vote);
         assertEquals(vote, register);
         verify(voteRepository).save(vote);
+    }
+
+    @Test
+    public void registerFailTest() {
+
+        var vote = generateVote();
+
+        when(voteRepository.save(vote)).thenReturn(vote);
+        when(agendaService.find(eq(vote.getAgenda().getId()))).thenReturn(vote.getAgenda());
+        when(associatedService.find(eq(vote.getAssociated().getId()))).thenReturn(vote.getAssociated());
+        when(voteService.list()).thenReturn(Arrays.asList(vote));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+           voteService.register(vote);
+        });
+
     }
 
     private Vote generateVote() {
