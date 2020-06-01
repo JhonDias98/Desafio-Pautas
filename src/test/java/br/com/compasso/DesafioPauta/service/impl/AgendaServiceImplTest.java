@@ -51,9 +51,12 @@ class AgendaServiceImplTest {
 
     @Test
     public void throwsExceptionWhenFindAgenda() {
+
         assertThrows(IllegalArgumentException.class, () -> {
-            agendaService.find("*");
+            agendaService.find("ew2");
         });
+
+        verify(agendaRepository).findById(any(String.class));
     }
 
     @Test

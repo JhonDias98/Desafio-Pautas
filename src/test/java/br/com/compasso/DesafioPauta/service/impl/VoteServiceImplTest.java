@@ -14,8 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,7 +40,7 @@ class VoteServiceImplTest {
     void listTest() {
 
         var vote = generateVote();
-        var votes = Arrays.asList(vote);
+        var votes = Collections.singletonList(vote);
         when(voteRepository.findAll()).thenReturn(votes);
         var voteList = voteService.list();
         assertEquals(votes, voteList);
@@ -62,7 +61,7 @@ class VoteServiceImplTest {
         when(voteRepository.save(vote)).thenReturn(vote);
         when(agendaService.find(eq(vote.getAgenda().getId()))).thenReturn(vote.getAgenda());
         when(associatedService.find(eq(vote.getAssociated().getId()))).thenReturn(vote.getAssociated());
-        when(voteService.list()).thenReturn(Arrays.asList(vote2));
+        when(voteService.list()).thenReturn(Collections.singletonList(vote2));
         Vote register = voteService.register(vote);
         assertEquals(vote, register);
         verify(voteRepository).save(vote);
@@ -76,11 +75,9 @@ class VoteServiceImplTest {
         when(voteRepository.save(vote)).thenReturn(vote);
         when(agendaService.find(eq(vote.getAgenda().getId()))).thenReturn(vote.getAgenda());
         when(associatedService.find(eq(vote.getAssociated().getId()))).thenReturn(vote.getAssociated());
-        when(voteService.list()).thenReturn(Arrays.asList(vote));
+        when(voteService.list()).thenReturn(Collections.singletonList(vote));
 
-        assertThrows(IllegalArgumentException.class, () -> {
-           voteService.register(vote);
-        });
+        assertThrows(IllegalArgumentException.class, () -> voteService.register(vote));
 
     }
 
