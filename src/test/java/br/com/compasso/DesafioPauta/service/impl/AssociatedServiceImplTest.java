@@ -13,8 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -61,8 +60,8 @@ class AssociatedServiceImplTest {
 
         var associated = generateAssociated();
         when(associatedRepository.save(associated)).thenReturn(associated);
-        var associateMock = associatedService.register(associated);
-        assertEquals(associated, associateMock);
+        var associatedMock = associatedService.register(associated);
+        assertEquals(associated, associatedMock);
         verify(associatedRepository).save(associated);
 
     }
