@@ -3,7 +3,6 @@ package br.com.compasso.DesafioPauta.controller;
 import br.com.compasso.DesafioPauta.converter.AgendaConverter;
 import br.com.compasso.DesafioPauta.dto.AgendaDto;
 import br.com.compasso.DesafioPauta.dto.details.AgendaDtoDetails;
-import br.com.compasso.DesafioPauta.dto.entry.AgendaEntry;
 import br.com.compasso.DesafioPauta.entity.Agenda;
 import br.com.compasso.DesafioPauta.enumeration.AgendaStatus;
 import br.com.compasso.DesafioPauta.service.impl.AgendaServiceImpl;
@@ -12,25 +11,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -79,7 +72,7 @@ class AgendaControllerTest {
         when(agendaService.find("1")).thenReturn(agenda);
         when(agendaConverter.agendaToAgendaDtoDetails(agendaService.find("1"))).thenReturn(new AgendaDtoDetails(agenda));
 
-        mockMvc.perform(get(("/agenda/{id}"),"1"))
+        mockMvc.perform(get(("/agenda/{id}"), "1"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.title").value(agenda.getTitle()))
                 .andExpect(jsonPath("$.description").value(agenda.getDescription()))
