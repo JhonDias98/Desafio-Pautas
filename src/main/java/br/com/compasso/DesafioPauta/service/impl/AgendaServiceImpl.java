@@ -36,6 +36,7 @@ public class AgendaServiceImpl implements AgendaService {
         agendaRepository.deleteById(id);
     }
 
+    @Override
     public void update(Agenda agenda) {
         agendaRepository.save(agenda);
     }

@@ -10,5 +10,6 @@ public interface AgendaService {
     Agenda find(String id);
     Agenda register(Agenda agenda);
     void delete(String id);
+    void update(Agenda agenda);
 
 }
