@@ -1,6 +1,7 @@
 package br.com.compasso.DesafioPauta.service.impl;
 
 import br.com.compasso.DesafioPauta.entity.Agenda;
+import br.com.compasso.DesafioPauta.enumeration.AgendaStatus;
 import br.com.compasso.DesafioPauta.repository.AgendaRepository;
 import br.com.compasso.DesafioPauta.service.AgendaService;
 import org.springframework.stereotype.Service;
@@ -39,5 +40,9 @@ public class AgendaServiceImpl implements AgendaService {
     @Override
     public void update(Agenda agenda) {
         agendaRepository.save(agenda);
+    }
+
+    public List<Agenda> listAgendasByStatus(AgendaStatus status) {
+        return agendaRepository.getAgendasWithStatus(status);
     }
 }

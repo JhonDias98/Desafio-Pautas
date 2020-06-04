@@ -5,6 +5,7 @@ import br.com.compasso.DesafioPauta.dto.AgendaDto;
 import br.com.compasso.DesafioPauta.dto.details.AgendaDtoDetails;
 import br.com.compasso.DesafioPauta.dto.entry.AgendaEntry;
 import br.com.compasso.DesafioPauta.entity.Agenda;
+import br.com.compasso.DesafioPauta.enumeration.AgendaStatus;
 import br.com.compasso.DesafioPauta.service.impl.AgendaServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -58,6 +59,12 @@ public class AgendaController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping(path = "/status/{status}")
+    public ResponseEntity<List<AgendaDto>> pickUpAgendasByStatus(@PathVariable AgendaStatus status) {
+        List<AgendaDto> agendaDtos = agendaConverter.listAgendaToListAgendaDto(agendaService.listAgendasByStatus(status));
+        return new ResponseEntity<>(agendaDtos, HttpStatus.OK);
     }
 
     @GetMapping(path = "/result")
