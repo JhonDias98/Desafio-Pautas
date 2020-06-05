@@ -8,6 +8,9 @@ import br.com.compasso.DesafioPauta.service.impl.AssociatedServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.ExposesResourceFor;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/associated")
+@ExposesResourceFor(Associated.class)
 public class AssociatedController {
 
     private final AssociatedServiceImpl associatedService;
@@ -35,7 +39,10 @@ public class AssociatedController {
     })
     public ResponseEntity<List<AssociatedDto>> listAssociateds() {
         try {
-            return new ResponseEntity<>(associatedConverter.listToListAssociatedDto(associatedService.list()), HttpStatus.OK);
+
+            List<Associated> associateds = associatedService.list();
+            List<AssociatedDto> associatedDtos = associatedConverter.listToListAssociatedDto(associateds);
+            return new ResponseEntity<>(associatedDtos, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -50,7 +57,9 @@ public class AssociatedController {
     public ResponseEntity<AssociatedDto> pickUpAssociated(@PathVariable("id") String id) {
 
         try{
-            return new ResponseEntity<>(associatedConverter.associatedToAssociatedDto(associatedService.find(id)), HttpStatus.OK);
+            Associated associated = associatedService.find(id);
+            AssociatedDto associatedDto = associatedConverter.associatedToAssociatedDto(associated);
+            return new ResponseEntity<>(associatedDto, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
