@@ -8,9 +8,7 @@ import br.com.compasso.DesafioPauta.service.impl.AssociatedServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.ExposesResourceFor;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,14 +36,9 @@ public class AssociatedController {
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<List<AssociatedDto>> listAssociateds() {
-        try {
 
-            List<Associated> associateds = associatedService.list();
-            List<AssociatedDto> associatedDtos = associatedConverter.listToListAssociatedDto(associateds);
-            return new ResponseEntity<>(associatedDtos, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(associatedConverter.listToListAssociatedDto(associatedService.list()), HttpStatus.OK);
+
     }
 
     @GetMapping(path = "/{id}")
@@ -56,12 +49,12 @@ public class AssociatedController {
     })
     public ResponseEntity<AssociatedDto> pickUpAssociated(@PathVariable("id") String id) {
 
-        try{
+        try {
             Associated associated = associatedService.find(id);
             AssociatedDto associatedDto = associatedConverter.associatedToAssociatedDto(associated);
             return new ResponseEntity<>(associatedDto, HttpStatus.OK);
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 
@@ -73,12 +66,9 @@ public class AssociatedController {
     })
     public ResponseEntity<AssociatedDto> registerAssociated(@Valid @RequestBody AssociatedEntry entry) {
 
-        try {
-            Associated associated = associatedConverter.entryToAssociated(entry);
-            return new ResponseEntity<>(associatedConverter.associatedToAssociatedDto(associatedService.register(associated)), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Associated associated = associatedConverter.entryToAssociated(entry);
+        return new ResponseEntity<>(associatedConverter.associatedToAssociatedDto(associatedService.register(associated)), HttpStatus.CREATED);
+
     }
 
     @DeleteMapping(path = "/{id}")

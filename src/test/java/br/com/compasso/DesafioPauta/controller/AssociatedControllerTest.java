@@ -83,7 +83,7 @@ class AssociatedControllerTest {
         when(associatedService.find("idIncorreto")).thenThrow(new IllegalArgumentException());
 
         mockMvc.perform(get(("/associated/{id}"), "idIncorreto"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNoContent());
 
     }
 
