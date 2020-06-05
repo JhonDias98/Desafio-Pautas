@@ -18,7 +18,7 @@ public class VoteServiceImpl implements VoteService {
     private final AgendaServiceImpl agendaService;
     private final AssociatedServiceImpl associatedService;
 
-    public VoteServiceImpl(VoteRepository voteRepository, AgendaRepository agendaRepository, AgendaServiceImpl agendaService, AssociatedServiceImpl associatedService) {
+    public VoteServiceImpl(VoteRepository voteRepository, AgendaServiceImpl agendaService, AssociatedServiceImpl associatedService) {
         this.voteRepository = voteRepository;
         this.agendaService = agendaService;
         this.associatedService = associatedService;
