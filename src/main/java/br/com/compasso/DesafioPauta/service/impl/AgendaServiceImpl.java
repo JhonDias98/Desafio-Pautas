@@ -24,7 +24,7 @@ public class AgendaServiceImpl implements AgendaService {
 
     @Override
     public Agenda find(String id) {
-        return agendaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
+        return agendaRepository.findById(id).orElseThrow(IllegalArgumentException::new);
     }
 
     @Override

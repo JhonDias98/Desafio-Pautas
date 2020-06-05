@@ -24,7 +24,7 @@ public class AssociatedServiceImpl implements AssociatedService {
 
     @Override
     public Associated find(String id) {
-        return associatedRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
+        return associatedRepository.findById(id).orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
