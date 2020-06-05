@@ -37,12 +37,7 @@ public class VoteController {
     })
     public ResponseEntity<List<VoteDto>> listVotes() {
 
-        try{
-            return new ResponseEntity<>(voteConverter.listVotesToListVotesDto(voteService.list()), HttpStatus.OK);
-        }catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+        return new ResponseEntity<>(voteConverter.listVotesToListVotesDto(voteService.list()), HttpStatus.OK);
     }
 
     @PostMapping
@@ -53,13 +48,8 @@ public class VoteController {
     })
     public ResponseEntity<VoteDto> registerVote(@Valid @RequestBody VoteEntry entry) {
 
-        try{
-            Vote vote = voteConverter.entryToVote(entry);
-            return new ResponseEntity<>(voteConverter.voteToVoteDto(voteService.register(vote)), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-
+        Vote vote = voteConverter.entryToVote(entry);
+        return new ResponseEntity<>(voteConverter.voteToVoteDto(voteService.register(vote)), HttpStatus.CREATED);
     }
 
 
