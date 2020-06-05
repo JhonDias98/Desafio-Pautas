@@ -23,8 +23,8 @@ public class Agenda {
     private String id;
     private String title;
     private String description;
-    private LocalDateTime begin;
-    private LocalDateTime end;
+    private LocalDateTime begin = LocalDateTime.now();
+    private LocalDateTime end = begin.plusMinutes(1);
     private int amountYes = 0;
     private int amountNo = 0;
     private AgendaStatus status = AgendaStatus.OPEN;
@@ -32,17 +32,12 @@ public class Agenda {
     public Agenda(AgendaEntry entry) {
         this.title = entry.getTitle();
         this.description = entry.getDescription();
-        this.begin = LocalDateTime.now();
 
-        //todo pode ser melhorado
-        if(entry.getDuration().isPresent())
-            this.end = begin.plusMinutes(entry.getDuration().get());
-        else
-            this.end = begin.plusMinutes(1L);
+        entry.getDuration().ifPresent(integer -> this.end = begin.plusMinutes(integer));
     }
 
     public void voteIn(VoteResponse vote) {
-        if(vote.equals(VoteResponse.YES))
+        if (vote.equals(VoteResponse.YES))
             amountYes++;
         else
             amountNo++;
