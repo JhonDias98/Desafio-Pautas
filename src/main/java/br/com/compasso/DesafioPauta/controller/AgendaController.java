@@ -38,11 +38,7 @@ public class AgendaController {
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<List<AgendaDto>> listAgendas() {
-        try {
-            return new ResponseEntity<>(agendaConverter.listAgendaToListAgendaDto(agendaService.list()), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(agendaConverter.listAgendaToListAgendaDto(agendaService.list()), HttpStatus.OK);
     }
 
     @GetMapping(path = "/{id}")
@@ -50,14 +46,14 @@ public class AgendaController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Pick agenda by variable path", response = AgendaDto.class),
             @ApiResponse(code = 400, message = "Bad request"),
-            @ApiResponse(code = 404, message = "Agenda not found"),
+            @ApiResponse(code = 204, message = "Agenda not found"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<AgendaDtoDetails> pickUpAgenda(@PathVariable String id) {
         try {
             return new ResponseEntity<>(agendaConverter.agendaToAgendaDtoDetails(agendaService.find(id)), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 
@@ -76,13 +72,8 @@ public class AgendaController {
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<List<AgendaDtoDetails>> listAgendaDetails() {
-
-        try {
-            List<AgendaDtoDetails> agendaDtoDetails = agendaConverter.agendasToAgendasDtoDetails(agendaService.list());
-            return new ResponseEntity<>(agendaDtoDetails, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        List<AgendaDtoDetails> agendaDtoDetails = agendaConverter.agendasToAgendasDtoDetails(agendaService.list());
+        return new ResponseEntity<>(agendaDtoDetails, HttpStatus.OK);
     }
 
     @PostMapping
@@ -93,12 +84,10 @@ public class AgendaController {
             @ApiResponse(code = 500, message = "Internal Sever Error")
     })
     public ResponseEntity<AgendaDto> createAgenda(@Valid @RequestBody AgendaEntry entry) {
-        try {
-            Agenda agenda = agendaConverter.entryToAgenda(entry);
-            return new ResponseEntity<>(agendaConverter.agendaToAgendaDto(agendaService.register(agenda)), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+
+        Agenda agenda = agendaConverter.entryToAgenda(entry);
+        return new ResponseEntity<>(agendaConverter.agendaToAgendaDto(agendaService.register(agenda)), HttpStatus.CREATED);
+
     }
 
     @DeleteMapping(path = "/{id}")

@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -84,16 +85,30 @@ class AgendaControllerTest {
 
     @Test
     void pickUpAgendaWithIdUnregistered() throws Exception {
-
         var Agenda = generateAgenda();
         when(agendaConverter.agendaToAgendaDtoDetails(agendaService.find(any(String.class)))).thenThrow(IllegalArgumentException.class);
 
         mockMvc.perform(get(("/agenda/{id}"), "hsu"))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isNoContent())
                 .equals(new IllegalArgumentException());
 
+    }
 
+    @Test
+    void pickUpAgendaByStatusTest() throws Exception {
+
+        var agenda = generateAgenda();
+        var agendasDto = Collections.singletonList(new AgendaDto(agenda));
+        when(agendaConverter.listAgendaToListAgendaDto(agendaService.listAgendasByStatus(AgendaStatus.OPEN)))
+                .thenReturn(agendasDto);
+
+        mockMvc.perform(get("/agenda/status/{status}", "OPEN"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value(agenda.getTitle()))
+                .andExpect(jsonPath("$[0].description").value(agenda.getDescription()))
+                .andExpect(jsonPath("$[0].status").value(agenda.getStatus().toString()))
+                .andDo(print());
     }
 
     @Test
