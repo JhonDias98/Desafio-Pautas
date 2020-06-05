@@ -54,10 +54,20 @@ class VoteControllerTest {
 
         return Vote.builder()
                 .id("1")
-                .agenda(new Agenda())
-                .associated(new Associated())
+                .agenda(generateAgenda())
+                .associated(generateAssociated())
                 .response(VoteResponse.YES)
                 .build();
+    }
+
+    private Agenda generateAgenda() {
+        return Agenda.builder()
+                .id("1")
+                .build();
+    }
+
+    private Associated generateAssociated() {
+        return Associated.builder().id("1").build();
     }
 
     @Test
@@ -65,7 +75,7 @@ class VoteControllerTest {
 
         var vote = generateVote();
 
-        when(voteService.list()).thenReturn(Collections.singletonList(vote));
+        //when(voteService.list()).thenReturn(Collections.singletonList(vote));
         when(voteConverter.listVotesToListVotesDto(voteService.list()))
                 .thenReturn(Collections.singletonList(new VoteDto(vote)));
 
