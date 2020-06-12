@@ -12,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -49,11 +51,11 @@ class AssociatedControllerTest {
     void listAssociateds() throws Exception {
 
         var associated = generateAssociated();
+        AssociatedDto associatedDto = generateAssociatedDto();
 
         when(associatedService.list()).thenReturn(Collections.singletonList(associated));
-        when(associatedConverter.listToListAssociatedDto(associatedService.list()))
-                .thenReturn(Collections.singletonList(new AssociatedDto(associated)));
-
+        when(associatedConverter.associatedToAssociatedDto(any(Associated.class))).thenReturn(associatedDto);
+        
         mockMvc.perform(get("/associated"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value(associated.getName()))
@@ -62,13 +64,13 @@ class AssociatedControllerTest {
     }
 
     @Test
-    void pickUpAssociated() throws Exception {
+    void pickUpAssociatedTest() throws Exception {
 
         var associated = generateAssociated();
 
+
         when(associatedService.find("!fd")).thenReturn(associated);
-        when(associatedConverter.associatedToAssociatedDto(associatedService.find("!fd")))
-                .thenReturn(new AssociatedDto(associated));
+        when(associatedConverter.associatedToAssociatedDto(associated)).thenReturn(generateAssociatedDto());
 
         mockMvc.perform(get("/associated/{id}", "!fd"))
                 .andExpect(status().isOk())
@@ -80,25 +82,25 @@ class AssociatedControllerTest {
     @Test
     void throw404WhenAssociatedIdIsUnregistered() throws Exception {
 
-        when(associatedService.find("idIncorreto")).thenThrow(new IllegalArgumentException());
+        when(associatedService.find("idIncorreto")).thenThrow(new ResourceNotFoundException());
 
         mockMvc.perform(get(("/associated/{id}"), "idIncorreto"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNotFound());
 
     }
 
     @Test
-    void registerAssociated() throws Exception {
+    void registerAssociatedTest() throws Exception {
 
         var associated = generateAssociated();
+        var associatedDTO = generateAssociatedDto();
 
-        when(associatedConverter.entryToAssociated(any(AssociatedEntry.class))).thenReturn(associated);
-        when(associatedService.register(associated)).thenReturn(associated);
-        when(associatedConverter.associatedToAssociatedDto(associatedService.register(associated)))
-                .thenReturn(new AssociatedDto(associated));
+        when(associatedService.register(associatedConverter.entryToAssociated(any(AssociatedEntry.class))))
+                .thenReturn(associated);
+        when(associatedConverter.associatedToAssociatedDto(associated)).thenReturn(associatedDTO);
 
         mockMvc.perform(post(("/associated"))
-                .content(objectMapper.writeValueAsString(new AssociatedDto(associated)))
+                .content(objectMapper.writeValueAsString(associatedDTO))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(associated.getName()))
@@ -107,7 +109,7 @@ class AssociatedControllerTest {
     }
 
     @Test
-    void deleteAssociated() throws Exception {
+    void deleteAssociatedTest() throws Exception {
 
         doNothing().when(associatedService).delete(any(String.class));
 
@@ -122,5 +124,12 @@ class AssociatedControllerTest {
                 .name("Matheus")
                 .email("matheus@email.com")
                 .build();
+    }
+
+    private AssociatedDto generateAssociatedDto() {
+        AssociatedDto associatedDto = new AssociatedDto("Matheus", "matheus@email.com");
+        associatedDto.add(Link.of("linkTeste"));
+
+        return associatedDto;
     }
 }

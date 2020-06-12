@@ -4,7 +4,6 @@ import br.com.compasso.DesafioPauta.entity.Agenda;
 import br.com.compasso.DesafioPauta.entity.Associated;
 import br.com.compasso.DesafioPauta.entity.Vote;
 import br.com.compasso.DesafioPauta.enumeration.AgendaStatus;
-import br.com.compasso.DesafioPauta.repository.AgendaRepository;
 import br.com.compasso.DesafioPauta.repository.VoteRepository;
 import br.com.compasso.DesafioPauta.service.VoteService;
 import org.springframework.stereotype.Service;

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/associated")
@@ -37,7 +38,11 @@ public class AssociatedController {
     })
     public ResponseEntity<List<AssociatedDto>> listAssociateds() {
 
-        return new ResponseEntity<>(associatedConverter.listToListAssociatedDto(associatedService.list()), HttpStatus.OK);
+        List<AssociatedDto> associatedDtos = associatedService.list().stream()
+                .map(associatedConverter::associatedToAssociatedDto)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(associatedDtos, HttpStatus.OK);
 
     }
 
@@ -49,13 +54,11 @@ public class AssociatedController {
     })
     public ResponseEntity<AssociatedDto> pickUpAssociated(@PathVariable("id") String id) {
 
-        try {
-            Associated associated = associatedService.find(id);
-            AssociatedDto associatedDto = associatedConverter.associatedToAssociatedDto(associated);
-            return new ResponseEntity<>(associatedDto, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+        AssociatedDto associatedDto = associatedConverter
+                .associatedToAssociatedDto(associatedService.find(id));
+
+        return new ResponseEntity<>(associatedDto, HttpStatus.OK);
+
     }
 
     @PostMapping
@@ -66,9 +69,10 @@ public class AssociatedController {
     })
     public ResponseEntity<AssociatedDto> registerAssociated(@Valid @RequestBody AssociatedEntry entry) {
 
-        Associated associated = associatedConverter.entryToAssociated(entry);
-        return new ResponseEntity<>(associatedConverter.associatedToAssociatedDto(associatedService.register(associated)), HttpStatus.CREATED);
+        Associated associated = associatedService.register(associatedConverter.entryToAssociated(entry));
+        AssociatedDto associatedDto = associatedConverter.associatedToAssociatedDto(associated);
 
+        return new ResponseEntity<>(associatedDto, HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/{id}")

@@ -1,19 +1,20 @@
 package br.com.compasso.DesafioPauta.service.impl;
 
-import br.com.compasso.DesafioPauta.entity.Agenda;
 import br.com.compasso.DesafioPauta.entity.Associated;
 import br.com.compasso.DesafioPauta.repository.AssociatedRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -50,8 +51,8 @@ class AssociatedServiceImplTest {
 
     @Test
     void findTestMustThrowException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-           associatedService.find("1");
+        assertThrows(ResourceNotFoundException.class, () -> {
+            associatedService.find("1");
         });
     }
 
@@ -65,7 +66,6 @@ class AssociatedServiceImplTest {
         verify(associatedRepository).save(associated);
 
     }
-
 
     @Test
     void deleteTest() {

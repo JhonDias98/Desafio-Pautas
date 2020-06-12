@@ -1,9 +1,9 @@
 package br.com.compasso.DesafioPauta.service.impl;
 
 import br.com.compasso.DesafioPauta.entity.Associated;
-
 import br.com.compasso.DesafioPauta.repository.AssociatedRepository;
 import br.com.compasso.DesafioPauta.service.AssociatedService;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class AssociatedServiceImpl implements AssociatedService {
 
     @Override
     public Associated find(String id) {
-        return associatedRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        return associatedRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override

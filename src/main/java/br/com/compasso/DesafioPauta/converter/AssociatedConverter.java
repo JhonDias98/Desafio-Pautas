@@ -3,22 +3,33 @@ package br.com.compasso.DesafioPauta.converter;
 import br.com.compasso.DesafioPauta.dto.AssociatedDto;
 import br.com.compasso.DesafioPauta.dto.entry.AssociatedEntry;
 import br.com.compasso.DesafioPauta.entity.Associated;
+import org.modelmapper.ModelMapper;
+import org.springframework.hateoas.server.EntityLinks;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class AssociatedConverter {
-    public List<AssociatedDto> listToListAssociatedDto(List<Associated> list) {
-        return list.stream().map(AssociatedDto::new).collect(Collectors.toList());
+
+    private final EntityLinks entityLinks;
+    private final ModelMapper modelMapper;
+
+    public AssociatedConverter(EntityLinks entityLinks, ModelMapper modelMapper) {
+        this.entityLinks = entityLinks;
+        this.modelMapper = modelMapper;
     }
 
     public AssociatedDto associatedToAssociatedDto(Associated associated) {
-        return new AssociatedDto(associated);
+
+        AssociatedDto associatedDto = modelMapper.map(associated, AssociatedDto.class);
+        associatedDto.add(entityLinks.linkToItemResource(Associated.class, associated.getId()).withSelfRel());
+
+        return associatedDto;
     }
 
     public Associated entryToAssociated(AssociatedEntry entry) {
-        return new Associated(entry);
+        return Associated.builder()
+                .name(entry.getName())
+                .email(entry.getEmail())
+                .build();
     }
 }
