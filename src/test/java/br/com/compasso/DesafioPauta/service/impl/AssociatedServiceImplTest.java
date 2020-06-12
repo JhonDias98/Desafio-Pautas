@@ -1,6 +1,7 @@
 package br.com.compasso.DesafioPauta.service.impl;
 
 import br.com.compasso.DesafioPauta.entity.Associated;
+import br.com.compasso.DesafioPauta.exception.EmailInUseException;
 import br.com.compasso.DesafioPauta.repository.AssociatedRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,6 +66,19 @@ class AssociatedServiceImplTest {
         assertEquals(associated, associatedMock);
         verify(associatedRepository).save(associated);
 
+    }
+
+    @Test
+    void registerWithEmailInUse() {
+
+        Associated associated = generateAssociated();
+
+        when(associatedService.register(associated)).thenThrow(new EmailInUseException());
+
+        assertThrows(EmailInUseException.class, () -> {
+           associatedService.register(associated);
+        });
+        
     }
 
     @Test
