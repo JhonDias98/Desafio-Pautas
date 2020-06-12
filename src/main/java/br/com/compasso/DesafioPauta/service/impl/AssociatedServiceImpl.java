@@ -1,6 +1,7 @@
 package br.com.compasso.DesafioPauta.service.impl;
 
 import br.com.compasso.DesafioPauta.entity.Associated;
+import br.com.compasso.DesafioPauta.exception.EmailInUseException;
 import br.com.compasso.DesafioPauta.repository.AssociatedRepository;
 import br.com.compasso.DesafioPauta.service.AssociatedService;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -29,7 +30,10 @@ public class AssociatedServiceImpl implements AssociatedService {
 
     @Override
     public Associated register(Associated associated) {
-        return associatedRepository.save(associated);
+        if(this.list().stream().anyMatch(associated1 -> associated1.getEmail().equals(associated.getEmail())))
+            throw new EmailInUseException();
+        else
+            return associatedRepository.save(associated);
     }
 
     @Override
