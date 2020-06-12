@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/vote")
@@ -37,7 +38,11 @@ public class VoteController {
     })
     public ResponseEntity<List<VoteDto>> listVotes() {
 
-        return new ResponseEntity<>(voteConverter.listVotesToListVotesDto(voteService.list()), HttpStatus.OK);
+        List<VoteDto> voteDtos = voteService.list().stream()
+                .map(voteConverter::voteToVoteDto)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(voteDtos, HttpStatus.OK);
     }
 
     @PostMapping

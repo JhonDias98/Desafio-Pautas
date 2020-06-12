@@ -1,6 +1,5 @@
 package br.com.compasso.DesafioPauta.entity;
 
-import br.com.compasso.DesafioPauta.dto.entry.VoteEntry;
 import br.com.compasso.DesafioPauta.enumeration.VoteResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,10 +24,4 @@ public class Vote {
     private Associated associated;
     private VoteResponse response;
 
-
-    public Vote(VoteEntry entry) {
-        this.agenda = entry.getAgenda();
-        this.associated = entry.getAssociated();
-        this.response = entry.getResponse();
-    }
 }

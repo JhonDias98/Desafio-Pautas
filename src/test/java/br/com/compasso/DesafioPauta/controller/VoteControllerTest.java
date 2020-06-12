@@ -50,6 +50,52 @@ class VoteControllerTest {
         objectMapper = new ObjectMapper();
     }
 
+    @Test
+    void listVotes() throws Exception {
+
+        var vote = generateVote();
+        var voteDto = generateVoteDto(vote);
+
+        //when(voteService.list()).thenReturn(Collections.singletonList(vote));
+        when(voteService.list()).thenReturn(Collections.singletonList(vote));
+        when(voteConverter.voteToVoteDto(any(Vote.class))).thenReturn(voteDto);
+
+        mockMvc.perform(get("/vote"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].agenda").value(vote.getAgenda()))
+                .andExpect(jsonPath("$[0].associated").value(vote.getAssociated()))
+                .andDo(print());
+
+        verify(voteService).list();
+        verify(voteConverter).voteToVoteDto(any(Vote.class));
+
+    }
+
+    @Test
+    void registerVote() throws Exception {
+
+        var vote = generateVote();
+        var voteDto = generateVoteDto(vote);
+
+        when(voteConverter.entryToVote(any(VoteEntry.class))).thenReturn(vote);
+        when(voteService.register(vote)).thenReturn(vote);
+        when(voteConverter.voteToVoteDto(any(Vote.class))).thenReturn(voteDto);
+
+        mockMvc.perform(post("/vote")
+                .content(objectMapper.writeValueAsString(vote))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.agenda").value(vote.getAgenda()))
+                .andExpect(jsonPath("$.associated").value(vote.getAssociated()))
+                .andDo(print());
+
+    }
+
+
+    private VoteDto generateVoteDto(Vote vote) {
+        return new VoteDto(vote.getAgenda(), vote.getAssociated());
+    }
+
     private Vote generateVote() {
 
         return Vote.builder()
@@ -69,43 +115,4 @@ class VoteControllerTest {
     private Associated generateAssociated() {
         return Associated.builder().id("1").build();
     }
-
-    @Test
-    void listVotes() throws Exception {
-
-        var vote = generateVote();
-
-        //when(voteService.list()).thenReturn(Collections.singletonList(vote));
-        when(voteConverter.listVotesToListVotesDto(voteService.list()))
-                .thenReturn(Collections.singletonList(new VoteDto(vote)));
-
-        mockMvc.perform(get("/vote"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].agenda").value(vote.getAgenda()))
-                .andExpect(jsonPath("$[0].associated").value(vote.getAssociated()))
-                .andDo(print());
-
-        verify(voteConverter).listVotesToListVotesDto(voteService.list());
-
-    }
-
-    @Test
-    void registerVote() throws Exception {
-
-        var vote = generateVote();
-
-        when(voteConverter.entryToVote(any(VoteEntry.class))).thenReturn(vote);
-        when(voteService.register(vote)).thenReturn(vote);
-        when(voteConverter.voteToVoteDto(voteService.register(vote))).thenReturn(new VoteDto(vote));
-
-        mockMvc.perform(post("/vote")
-                .content(objectMapper.writeValueAsString(vote))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.agenda").value(vote.getAgenda()))
-                .andExpect(jsonPath("$.associated").value(vote.getAssociated()))
-                .andDo(print());
-
-    }
-
 }
