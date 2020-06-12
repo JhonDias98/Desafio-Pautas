@@ -4,6 +4,7 @@ import br.com.compasso.DesafioPauta.entity.Agenda;
 import br.com.compasso.DesafioPauta.enumeration.AgendaStatus;
 import br.com.compasso.DesafioPauta.repository.AgendaRepository;
 import br.com.compasso.DesafioPauta.service.AgendaService;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class AgendaServiceImpl implements AgendaService {
 
     @Override
     public Agenda find(String id) {
-        return agendaRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        return agendaRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override

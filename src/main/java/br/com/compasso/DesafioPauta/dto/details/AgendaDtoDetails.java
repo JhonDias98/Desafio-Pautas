@@ -1,12 +1,15 @@
 package br.com.compasso.DesafioPauta.dto.details;
 
-import br.com.compasso.DesafioPauta.entity.Agenda;
 import br.com.compasso.DesafioPauta.enumeration.AgendaStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class AgendaDtoDetails {
 
     private String title;
@@ -14,13 +17,5 @@ public class AgendaDtoDetails {
     private int amountYes;
     private int amountNo;
     private AgendaStatus status;
-
-    public AgendaDtoDetails(Agenda agenda) {
-        this.title = agenda.getTitle();
-        this.description = agenda.getDescription();
-        this.amountYes = agenda.getAmountYes();
-        this.amountNo = agenda.getAmountNo();
-        this.status = agenda.getStatus();
-    }
 
 }

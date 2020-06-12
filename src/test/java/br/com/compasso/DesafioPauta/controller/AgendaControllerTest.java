@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AgendaController.class)
 class AgendaControllerTest {
 
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -46,7 +46,6 @@ class AgendaControllerTest {
 
     private static ObjectMapper objectMapper;
 
-
     @BeforeAll
     public static void setUp() {
         objectMapper = new ObjectMapper();
@@ -56,8 +55,10 @@ class AgendaControllerTest {
     void listAgendas() throws Exception {
 
         var agenda = generateAgenda();
-        AgendaDto agendaDto = new AgendaDto(agenda);
-        when(agendaConverter.listAgendaToListAgendaDto(agendaService.list())).thenReturn(Arrays.asList(agendaDto));
+        AgendaDto agendaDto = generateAgendaDto(agenda);
+
+        when(agendaService.list()).thenReturn(Collections.singletonList(agenda));
+        when(agendaConverter.agendaToAgendaDto(any(Agenda.class))).thenReturn(agendaDto);
 
         mockMvc.perform(get(("/agenda")))
                 .andExpect(status().is2xxSuccessful())
@@ -68,10 +69,30 @@ class AgendaControllerTest {
     }
 
     @Test
-    void pickUpAgenda() throws Exception {
+    void listAgendaDetails() throws Exception {
         var agenda = generateAgenda();
+        var agendaDtoDetails = generateAgendaDtoDetails(agenda);
+
+        when(agendaService.list()).thenReturn(Arrays.asList(agenda));
+        when(agendaConverter.agendaToAgendaDtoDetails(any(Agenda.class))).thenReturn(agendaDtoDetails);
+
+        mockMvc.perform(get(("/agenda/result")))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$[0].title").value(agenda.getTitle()))
+                .andExpect(jsonPath("$[0].description").value(agenda.getDescription()))
+                .andExpect(jsonPath("$[0].amountYes").value(agenda.getAmountYes()))
+                .andExpect(jsonPath("$[0].amountNo").value(agenda.getAmountNo()))
+                .andExpect(jsonPath("$[0].status").value(agenda.getStatus().toString()));
+    }
+
+    @Test
+    void pickUpAgenda() throws Exception {
+
+        var agenda = generateAgenda();
+        var agendaDtoDetails = generateAgendaDtoDetails(agenda);
+
         when(agendaService.find("1")).thenReturn(agenda);
-        when(agendaConverter.agendaToAgendaDtoDetails(agendaService.find("1"))).thenReturn(new AgendaDtoDetails(agenda));
+        when(agendaConverter.agendaToAgendaDtoDetails(agendaService.find("1"))).thenReturn(agendaDtoDetails);
 
         mockMvc.perform(get(("/agenda/{id}"), "1"))
                 .andExpect(status().is2xxSuccessful())
@@ -86,12 +107,13 @@ class AgendaControllerTest {
     @Test
     void pickUpAgendaWithIdUnregistered() throws Exception {
         var Agenda = generateAgenda();
-        when(agendaConverter.agendaToAgendaDtoDetails(agendaService.find(any(String.class)))).thenThrow(IllegalArgumentException.class);
+        when(agendaConverter.agendaToAgendaDtoDetails(agendaService.find(any(String.class))))
+                .thenThrow(ResourceNotFoundException.class);
 
         mockMvc.perform(get(("/agenda/{id}"), "hsu"))
                 .andDo(print())
-                .andExpect(status().isNoContent())
-                .equals(new IllegalArgumentException());
+                .andExpect(status().isNotFound())
+                .equals(new ResourceNotFoundException());
 
     }
 
@@ -99,9 +121,11 @@ class AgendaControllerTest {
     void pickUpAgendaByStatusTest() throws Exception {
 
         var agenda = generateAgenda();
-        var agendasDto = Collections.singletonList(new AgendaDto(agenda));
-        when(agendaConverter.listAgendaToListAgendaDto(agendaService.listAgendasByStatus(AgendaStatus.OPEN)))
-                .thenReturn(agendasDto);
+        var agendaDto = generateAgendaDto(agenda);
+        var agendasDto = Collections.singletonList(agendaDto);
+
+        when(agendaService.listAgendasByStatus(AgendaStatus.OPEN)).thenReturn(Collections.singletonList(agenda));
+        when(agendaConverter.agendaToAgendaDto(agenda)).thenReturn(agendaDto);
 
         mockMvc.perform(get("/agenda/status/{status}", "OPEN"))
                 .andExpect(status().isOk())
@@ -112,26 +136,12 @@ class AgendaControllerTest {
     }
 
     @Test
-    void listAgendaDetails() throws Exception {
-        var agenda = generateAgenda();
-        when(agendaService.list()).thenReturn(Arrays.asList(agenda));
-        when(agendaConverter.agendasToAgendasDtoDetails(agendaService.list())).thenReturn(Arrays.asList(new AgendaDtoDetails(agenda)));
-
-        mockMvc.perform(get(("/agenda/result")))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$[0].title").value(agenda.getTitle()))
-                .andExpect(jsonPath("$[0].description").value(agenda.getDescription()))
-                .andExpect(jsonPath("$[0].amountYes").value(agenda.getAmountYes()))
-                .andExpect(jsonPath("$[0].amountNo").value(agenda.getAmountNo()))
-                .andExpect(jsonPath("$[0].status").value(agenda.getStatus().toString()));
-    }
-
-    @Test
     void createAgenda() throws Exception {
 
         var agenda = generateAgenda();
+        var agendaDto = generateAgendaDto(agenda);
         when(agendaConverter.agendaToAgendaDto(agendaService.register(any(Agenda.class))))
-                .thenReturn(new AgendaDto(agenda));
+                .thenReturn(agendaDto);
 
         mockMvc.perform(post(("/agenda"))
                 .content(asJsonString(agenda))
@@ -173,6 +183,20 @@ class AgendaControllerTest {
                 .end(LocalDateTime.now().plusMinutes(1))
                 .amountYes(0)
                 .amountNo(0)
+                .build();
+    }
+
+    private AgendaDto generateAgendaDto(Agenda agenda) {
+        return new AgendaDto(agenda.getTitle(), agenda.getDescription(), agenda.getStatus().toString());
+    }
+
+    private AgendaDtoDetails generateAgendaDtoDetails(Agenda agenda) {
+        return AgendaDtoDetails.builder()
+                .title(agenda.getTitle())
+                .description(agenda.getDescription())
+                .status(agenda.getStatus())
+                .amountYes(agenda.getAmountYes())
+                .amountNo(agenda.getAmountNo())
                 .build();
     }
 }

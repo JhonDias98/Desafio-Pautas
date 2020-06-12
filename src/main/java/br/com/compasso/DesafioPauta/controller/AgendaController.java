@@ -10,15 +10,18 @@ import br.com.compasso.DesafioPauta.service.impl.AgendaServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/agenda")
+@ExposesResourceFor(Agenda.class)
 public class AgendaController {
 
     private final AgendaServiceImpl agendaService;
@@ -29,7 +32,6 @@ public class AgendaController {
         this.agendaConverter = agendaConverter;
     }
 
-
     @GetMapping
     @ApiOperation(value = "List all registered agendas")
     @ApiResponses(value = {
@@ -38,28 +40,11 @@ public class AgendaController {
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<List<AgendaDto>> listAgendas() {
-        return new ResponseEntity<>(agendaConverter.listAgendaToListAgendaDto(agendaService.list()), HttpStatus.OK);
-    }
 
-    @GetMapping(path = "/{id}")
-    @ApiOperation(value = "Find agenda by ID")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Pick agenda by variable path", response = AgendaDto.class),
-            @ApiResponse(code = 400, message = "Bad request"),
-            @ApiResponse(code = 204, message = "Agenda not found"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
-    })
-    public ResponseEntity<AgendaDtoDetails> pickUpAgenda(@PathVariable String id) {
-        try {
-            return new ResponseEntity<>(agendaConverter.agendaToAgendaDtoDetails(agendaService.find(id)), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-    }
+        List<AgendaDto> agendaDtos = agendaService.list().stream()
+                .map(agendaConverter::agendaToAgendaDto)
+                .collect(Collectors.toList());
 
-    @GetMapping(path = "/status/{status}")
-    public ResponseEntity<List<AgendaDto>> pickUpAgendasByStatus(@PathVariable AgendaStatus status) {
-        List<AgendaDto> agendaDtos = agendaConverter.listAgendaToListAgendaDto(agendaService.listAgendasByStatus(status));
         return new ResponseEntity<>(agendaDtos, HttpStatus.OK);
     }
 
@@ -72,8 +57,35 @@ public class AgendaController {
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<List<AgendaDtoDetails>> listAgendaDetails() {
-        List<AgendaDtoDetails> agendaDtoDetails = agendaConverter.agendasToAgendasDtoDetails(agendaService.list());
-        return new ResponseEntity<>(agendaDtoDetails, HttpStatus.OK);
+        List<AgendaDtoDetails> dtoDetails = agendaService.list().stream()
+                .map(agendaConverter::agendaToAgendaDtoDetails)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(dtoDetails, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{id}")
+    @ApiOperation(value = "Find agenda by ID")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Pick agenda by variable path", response = AgendaDto.class),
+            @ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 204, message = "Agenda not found"),
+            @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    public ResponseEntity<AgendaDtoDetails> pickUpAgenda(@PathVariable String id) {
+
+        return new ResponseEntity<>(agendaConverter.agendaToAgendaDtoDetails(agendaService.find(id)), HttpStatus.OK);
+
+    }
+
+    @GetMapping(path = "/status/{status}")
+    public ResponseEntity<List<AgendaDto>> pickUpAgendasByStatus(@PathVariable AgendaStatus status) {
+
+        List<AgendaDto> agendaDtos = agendaService.listAgendasByStatus(status).stream()
+                .map(agendaConverter::agendaToAgendaDto)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(agendaDtos, HttpStatus.OK);
     }
 
     @PostMapping

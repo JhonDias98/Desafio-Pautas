@@ -1,6 +1,5 @@
 package br.com.compasso.DesafioPauta.entity;
 
-import br.com.compasso.DesafioPauta.dto.entry.AgendaEntry;
 import br.com.compasso.DesafioPauta.enumeration.AgendaStatus;
 import br.com.compasso.DesafioPauta.enumeration.VoteResponse;
 import lombok.AllArgsConstructor;
@@ -28,13 +27,6 @@ public class Agenda {
     private int amountYes = 0;
     private int amountNo = 0;
     private AgendaStatus status = AgendaStatus.OPEN;
-
-    public Agenda(AgendaEntry entry) {
-        this.title = entry.getTitle();
-        this.description = entry.getDescription();
-
-        entry.getDuration().ifPresent(integer -> this.end = begin.plusMinutes(integer));
-    }
 
     public void voteIn(VoteResponse vote) {
         if (vote.equals(VoteResponse.YES))

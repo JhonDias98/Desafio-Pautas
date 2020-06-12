@@ -4,30 +4,55 @@ import br.com.compasso.DesafioPauta.dto.AgendaDto;
 import br.com.compasso.DesafioPauta.dto.details.AgendaDtoDetails;
 import br.com.compasso.DesafioPauta.dto.entry.AgendaEntry;
 import br.com.compasso.DesafioPauta.entity.Agenda;
+import org.modelmapper.ModelMapper;
+import org.springframework.hateoas.server.EntityLinks;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class AgendaConverter {
-    public List<AgendaDto> listAgendaToListAgendaDto(List<Agenda> listAgendas) {
-        return listAgendas.stream().map(AgendaDto::new).collect(Collectors.toList());
+
+    private final EntityLinks entityLinks;
+    private final ModelMapper modelMapper;
+
+    public AgendaConverter(EntityLinks entityLinks, ModelMapper modelMapper) {
+        this.entityLinks = entityLinks;
+        this.modelMapper = modelMapper;
     }
 
     public AgendaDto agendaToAgendaDto(Agenda agenda) {
-        return new AgendaDto(agenda);
+
+        AgendaDto agendaDto = modelMapper.map(agenda, AgendaDto.class);
+        agendaDto.add(entityLinks.linkToItemResource(Agenda.class, agenda.getId()).withSelfRel());
+
+        return agendaDto;
     }
 
     public Agenda entryToAgenda(AgendaEntry entry) {
-        return new Agenda(entry);
-    }
 
-    public List<AgendaDtoDetails> agendasToAgendasDtoDetails(List<Agenda> list) {
-        return list.stream().map(AgendaDtoDetails::new).collect(Collectors.toList());
+        Agenda agenda = Agenda.builder()
+                .title(entry.getTitle())
+                .description(entry.getDescription())
+                .build();
+
+        entry.getDuration().ifPresent(integer -> {
+            agenda.setEnd(agenda.getBegin().plusMinutes(integer));
+        });
+
+        return agenda;
+        //return new Agenda(entry);
     }
 
     public AgendaDtoDetails agendaToAgendaDtoDetails(Agenda agenda) {
-        return new AgendaDtoDetails(agenda);
+
+        AgendaDtoDetails agendaDtoDetails = AgendaDtoDetails.builder()
+                .title(agenda.getTitle())
+                .description(agenda.getDescription())
+                .amountYes(agenda.getAmountYes())
+                .amountNo(agenda.getAmountNo())
+                .status(agenda.getStatus())
+                .build();
+
+        return agendaDtoDetails;
+
     }
 }
