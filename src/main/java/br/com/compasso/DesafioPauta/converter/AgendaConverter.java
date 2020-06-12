@@ -29,17 +29,16 @@ public class AgendaConverter {
 
     public Agenda entryToAgenda(AgendaEntry entry) {
 
-        Agenda agenda = Agenda.builder()
-                .title(entry.getTitle())
-                .description(entry.getDescription())
-                .build();
+        Agenda agenda = new Agenda();
+        agenda.setTitle(entry.getTitle());
+        agenda.setDescription(entry.getDescription());
 
         entry.getDuration().ifPresent(integer -> {
             agenda.setEnd(agenda.getBegin().plusMinutes(integer));
         });
 
         return agenda;
-        //return new Agenda(entry);
+
     }
 
     public AgendaDtoDetails agendaToAgendaDtoDetails(Agenda agenda) {
